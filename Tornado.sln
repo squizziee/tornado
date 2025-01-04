@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35506.116 d17.12
+VisualStudioVersion = 17.12.35506.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tornado.API", "Tornado.API\Tornado.API.csproj", "{6CE6EEF0-1F6B-439A-B27D-02CDA551DB56}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tornado.Domain", "Tornado.Domain\Tornado.Domain.csproj", "{F604B38E-D115-4760-9508-712A89CC2FF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tornado.Infrastructure", "Tornado.Infrastructure\Tornado.Infrastructure.csproj", "{248CB19D-859F-431A-823C-230499D1C199}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{F604B38E-D115-4760-9508-712A89CC2FF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F604B38E-D115-4760-9508-712A89CC2FF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F604B38E-D115-4760-9508-712A89CC2FF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{248CB19D-859F-431A-823C-230499D1C199}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{248CB19D-859F-431A-823C-230499D1C199}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{248CB19D-859F-431A-823C-230499D1C199}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{248CB19D-859F-431A-823C-230499D1C199}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -3,6 +3,8 @@
     public class VideoCommentChain
     {
         public Guid Id { get; set; }
-        public List<VideoComment> VideoComments { get; set; } = [];
+        public Guid VideoId { get; set; }
+        public Video Video { get; set; }
+        public IEnumerable<VideoComment> VideoComments { get; set; } = [];
     }
 }
