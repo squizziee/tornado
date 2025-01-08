@@ -11,7 +11,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <Folder Include="wwwroot\uploads\videos\q360p\" />
+    <Folder Include="wwwroot\uploads\videos\q1440p\" />
+    <Folder Include="wwwroot\uploads\videos\q2160p\" />
+    <Folder Include="wwwroot\uploads\videos\q1080p\" />
+    <Folder Include="wwwroot\uploads\videos\q720p\" />
+    <Folder Include="wwwroot\uploads\videos\q480p\" />
+    <Folder Include="wwwroot\uploads\videos\q240p\" />
+    <Folder Include="wwwroot\uploads\videos\src\" />
+    <Folder Include="wwwroot\uploads\videos\q144p\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tornado.Application\Tornado.Application.csproj" />
+    <ProjectReference Include="..\Tornado.Contracts\Tornado.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

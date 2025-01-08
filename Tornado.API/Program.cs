@@ -1,4 +1,22 @@
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.EntityFrameworkCore;
+using Tornado.Application.UseCases;
+using Tornado.Application.UseCases.Interfaces;
+using Tornado.Infrastructure.Data;
+using Tornado.Infrastructure.Services;
+using Tornado.Infrastructure.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options => options.Limits.MaxRequestBodySize = 500 * 1024 * 1024);
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 500 * 1024 * 1024;
+});
+
+builder.Services.AddDbContext<ApplicationDatabaseContext>(options => 
+    options.UseNpgsql(connectionString: builder.Configuration.GetConnectionString("DefaultDatabaseConnectionString"))
+);
 
 // Add services to the container.
 
@@ -6,6 +24,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IUploadVideoUseCase, UploadVideoUseCase>();
+builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 
 var app = builder.Build();
 

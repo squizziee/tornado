@@ -16,6 +16,9 @@
 # Mono auto generated files
 mono_crash.*
 
+# Static files
+wwwroot/
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
