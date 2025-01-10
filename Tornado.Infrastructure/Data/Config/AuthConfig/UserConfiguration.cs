@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Tornado.Domain.Models.Auth;
-using Tornado.Domain.Models.ProfileModels;
 
 namespace Tornado.Infrastructure.Data.Config.AuthConfig
 {
@@ -21,6 +20,10 @@ namespace Tornado.Infrastructure.Data.Config.AuthConfig
                 .Property(user => user.Email)
                 .HasMaxLength(50)
                 .IsRequired();
+
+            builder
+                .HasIndex(user => user.Email)
+                .IsUnique();
 
             builder
                 .Property(user => user.PasswordHash)

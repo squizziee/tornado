@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Tornado.Domain.Models;
 using Tornado.Domain.Models.Auth;
 using Tornado.Domain.Models.ChannelModels;
@@ -27,9 +28,17 @@ namespace Tornado.Infrastructure.Data
         public DbSet<VideoRating> VideoRatings { get; set; }
         public DbSet<VideoMetrics> VideoMetrics { get; set; }
 
-        public ApplicationDatabaseContext(DbContextOptions<ApplicationDatabaseContext> options)
+        private IConfiguration _configuration;
+
+        public ApplicationDatabaseContext(DbContextOptions<ApplicationDatabaseContext> options, IConfiguration configuration)
             : base(options)
         {
+            _configuration = configuration;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseNpgsql(_configuration["DefaultDatabaseConnectionString"]);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
