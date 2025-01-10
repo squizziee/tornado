@@ -14,7 +14,8 @@ namespace Tornado.Domain.Models.VideoModels
         public Channel Channel { get; set; }
         public IEnumerable<VideoCommentChain> VideoCommentChains { get; set; }
         public IEnumerable<VideoRating> VideoRatings { get; set; }
-        public string SourceUrl { get; set; } = string.Empty;
+        public string SourceFileName { get; set; } = string.Empty;
+        public string PreviewSourceUrl { get; set; } = string.Empty;
         public TimeSpan Duration { get; set; }
         public VideoMetrics Metrics { get; set; }
     }

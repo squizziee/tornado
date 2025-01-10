@@ -4,6 +4,7 @@ using Tornado.Infrastructure.Services.Interfaces;
 using FFMpegCore;
 using Microsoft.Extensions.Configuration;
 using FFMpegCore.Enums;
+using System.Diagnostics;
 
 namespace Tornado.Infrastructure.Services
 {
@@ -40,6 +41,7 @@ namespace Tornado.Infrastructure.Services
 				.GetSection("VideoUpload")
 				.Get<UploadDirectories>();
 
+			// random file name
 			var fileName = Guid
 				.NewGuid()
 				.ToString();
@@ -55,6 +57,7 @@ namespace Tornado.Infrastructure.Services
                 throw new Exception("Uploaded file size was zero");
 			}
 
+			// source file is uploaded in raw format
 			using (var stream = File.Create(uploadPath))
 			{
 				logger.LogInformation($"Started new source file upload on {uploadPath}");
@@ -76,13 +79,13 @@ namespace Tornado.Infrastructure.Services
                 throw new Exception($"Unsupported resolution was provided: {videoWidth}x{videoHeight}");
             }
 
-			await ProcessWithFFMpeg(uploadPath, fileName, closestPossibleDimensions, dirs);	
+			await ProcessWithFFMpegMt(uploadPath, fileName, closestPossibleDimensions, dirs);	
 
 			return fileName;
 		}
 
 		// processing with ffmpegcore
-		private async Task ProcessWithFFMpeg(
+		private void ProcessWithFFMpeg(
 			string srcFilePath,
 			string fileName,
 			int maxDimensionsIndex, 
@@ -97,12 +100,15 @@ namespace Tornado.Infrastructure.Services
 				.Skip(2)
 				.ToList();
 
-			// encode video in every format equal and below the original dimensions
+            var overallTimer = Stopwatch.StartNew();
+
+            // encode video in every format equal and below the original dimensions
             for (int i = maxDimensionsIndex; i >= 0; i--)
 			{
 				var outputWidth = dimensions[i].Item1;
 				var outputHeight = dimensions[i].Item2;
 
+				// path to upload for current dimension
                 var currentDimensionUploadPath = Path.Combine(
 					Directory.GetCurrentDirectory(),
                     uploadDirectories.Root,
@@ -112,7 +118,10 @@ namespace Tornado.Infrastructure.Services
 
                 logger.LogInformation($"Started uploading {outputWidth}x{outputHeight} for {fileName}");
 
-                await FFMpegArguments
+                var timer = Stopwatch.StartNew();
+
+                // encode with H.264 and AAC codecs and resizing
+                FFMpegArguments
 					.FromFileInput(srcFilePath)
 					.OutputToFile(
                         currentDimensionUploadPath,
@@ -124,16 +133,95 @@ namespace Tornado.Infrastructure.Services
 								.Scale(outputWidth, outputHeight)
 							)
 							.WithFastStart()
-					//.WithVideoFilters($"scale={outputWidth}:{outputHeight}:force_original_aspect_ratio=decrease,pad={outputWidth}:{outputHeight}:(ow-iw)/2:(oh-ih)/2")
 					)
-					.ProcessAsynchronously();
-					;
+					.ProcessSynchronously();
 
-                logger.LogInformation($"Ended uploading {outputWidth}x{outputHeight} for {fileName}");
+                timer.Stop();
+
+                logger.LogInformation($"Ended uploading {outputWidth}x{outputHeight} for {fileName}. Time elapsed: {timer.ElapsedMilliseconds / 1000.0} s");
             }
-		}
 
-		private int FindClosestDimensions(int height)
+            overallTimer.Stop();
+
+            logger.LogInformation($"Upload for {fileName} finished. {maxDimensionsIndex + 1} videos encoded. Time elapsed: {overallTimer.ElapsedMilliseconds / 1000.0} s");
+        }
+
+        private async Task ProcessWithFFMpegMt(
+			string srcFilePath,
+			string fileName,
+			int maxDimensionsIndex,
+			UploadDirectories uploadDirectories)
+        {
+            // map UploadDirectories as List sorted from the smallest resolution to the biggest
+            // skipping Root and Source
+            var mappedDirs = uploadDirectories
+                .GetType()
+                .GetProperties()
+                .Select(prop => prop.GetValue(uploadDirectories) as string)
+                .Skip(2)
+                .ToList();
+
+            var overallTimer = Stopwatch.StartNew();
+
+            var tasks = new Task[maxDimensionsIndex + 1];
+
+            // encode video in every format equal and below the original dimensions
+            for (int i = maxDimensionsIndex; i >= 0; i--)
+            {
+                var outputWidth = dimensions[i].Item1;
+                var outputHeight = dimensions[i].Item2;
+
+                // path to upload for current dimension
+                var currentDimensionUploadPath = Path.Combine(
+                    Directory.GetCurrentDirectory(),
+                    uploadDirectories.Root,
+                    mappedDirs[i]!,
+                    fileName + ".mov"
+                );
+
+                // encode with H.264 and AAC codecs with resizing
+                tasks[i] = Task.Factory.StartNew(() =>
+                {
+                    logger.LogInformation($"Started uploading {outputWidth}x{outputHeight} for {fileName}");
+
+                    var timer = Stopwatch.StartNew();
+
+                    FFMpegArguments
+                    .FromFileInput(srcFilePath)
+                    .OutputToFile(
+                        currentDimensionUploadPath,
+                        false,
+                        options => options
+                            .WithVideoCodec(VideoCodec.LibX264)
+                            .WithAudioCodec(AudioCodec.Aac)
+                            .WithVideoFilters(filterOptions => filterOptions
+                                .Scale(outputWidth, outputHeight)
+                            )
+                            //.WithFastStart()
+                    )
+                    .ProcessSynchronously();
+
+                    timer.Stop();
+
+                    logger.LogInformation($"Ended uploading {outputWidth}x{outputHeight} for {fileName}. Time elapsed: {timer.ElapsedMilliseconds / 1000.0} s");
+                });
+            }
+
+            await Task.Factory.ContinueWhenAll(tasks, completedTasks =>		
+            {
+				overallTimer.Stop();
+                logger.LogInformation($"Upload for {fileName} finished. {maxDimensionsIndex + 1} videos encoded. Time elapsed: {overallTimer.ElapsedMilliseconds / 1000.0} s");
+            });
+        }
+
+        // closest (rounded upwards) standart dimension searched by height, 
+        // e.g. 1263x701 -> 1280x720,
+        // e.g. 1000x481 -> 1280x720.
+        // Final result will most likely have black frame if it does
+        // not suit standart dimensions or is vertical. This is done to preserve all of
+        // the uploaded content. The algorithm is temprorary, will be
+        // much more adaptable in the future.
+        private static int FindClosestDimensions(int height)
 		{
 			var counter = 0;
 			foreach (var dimension in dimensions)

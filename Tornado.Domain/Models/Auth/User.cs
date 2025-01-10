@@ -1,4 +1,5 @@
-﻿using Tornado.Domain.Models.ProfileModels;
+﻿using Tornado.Domain.Enums;
+using Tornado.Domain.Models.ProfileModels;
 
 namespace Tornado.Domain.Models.Auth
 {
@@ -9,5 +10,7 @@ namespace Tornado.Domain.Models.Auth
         public UserProfile Profile { get; set; }
         public string Email { get; set; } = string.Empty;
         public string PasswordHash { get; set; } = string.Empty;
+        public string RefreshToken { get; set; } = string.Empty;
+        public UserRole Role { get; set; }
     }
 }

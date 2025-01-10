@@ -1,6 +1,5 @@
 ﻿using Tornado.Domain.Models.Auth;
 using Tornado.Domain.Models.ChannelModels;
-using Tornado.Domain.Models.ProfileModels;
 
 namespace Tornado.Domain.Models.ProfileModels
 {

@@ -23,7 +23,12 @@ namespace Tornado.Infrastructure.Data.Config.VideoConfig
                 .IsRequired();
 
             builder
-                .Property(video => video.SourceUrl)
+                .Property(video => video.SourceFileName)
+                .HasMaxLength(65535)
+                .IsRequired();
+
+            builder
+                .Property(video => video.PreviewSourceUrl)
                 .HasMaxLength(65535)
                 .IsRequired();
 

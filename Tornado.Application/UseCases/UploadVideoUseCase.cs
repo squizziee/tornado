@@ -28,7 +28,7 @@ namespace Tornado.Application.UseCases
             try
             {
                 var file = request.VideoData;
-                await videoUploadService.Upload(file, cancellationToken);
+                //Task.Run(() => videoUploadService.Upload(file, cancellationToken));
             }
             catch (Exception ex)
             {

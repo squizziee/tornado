@@ -25,6 +25,14 @@ namespace Tornado.Infrastructure.Data.Config.AuthConfig
             builder
                 .Property(user => user.PasswordHash)
                 .IsRequired();
+
+            builder
+                .Property(user => user.RefreshToken)
+                .IsRequired();
+
+            builder
+                .Property(user => user.Role)
+                .IsRequired();
         }
     }
 }
