@@ -1,9 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using Tornado.Application.UseCases.Interfaces;
 using Tornado.Contracts.Requests;
+using Tornado.Domain.Enums;
 using Tornado.Domain.Models.Auth;
 using Tornado.Domain.Models.ProfileModels;
 using Tornado.Infrastructure.Interfaces;
+using Tornado.Infrastructure.Services.Interfaces;
 
 namespace Tornado.Application.UseCases
 {
@@ -11,24 +13,28 @@ namespace Tornado.Application.UseCases
     {
         private readonly IUnitOfWork _unitOfWork;
         private ILogger<RegisterUserUseCase> _logger;
+        private readonly IPasswordHashingService _passwordHashingService;
 
         public RegisterUserUseCase(
             IUnitOfWork unitOfWork,
-            ILogger<RegisterUserUseCase> logger)
+            ILogger<RegisterUserUseCase> logger,
+            IPasswordHashingService passwordHashingService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _passwordHashingService = passwordHashingService;
         }
 
         public async Task ExecuteAsync(RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            var tryFind = await _unitOfWork.UserRepository.FindByEmailAsync(request.Email);
+            var tryFind = await _unitOfWork.UserRepository.FindByEmailAsync(request.Email, cancellationToken);
 
             if (tryFind != null)
             {
                 throw new Exception($"Email {request.Email} is already registered");
             }
 
+            // performed inside a transaction for space preservation purposes
             try
             {
                 _logger.LogInformation("Creating new transaction...");
@@ -44,8 +50,9 @@ namespace Tornado.Application.UseCases
                 {
                     Id = newUserId,
                     Email = request.Email,
-                    PasswordHash = SimpleHash(request.Password),
+                    PasswordHash = _passwordHashingService.GenerateHash(request.Password),
                     ProfileId = newUserProfileId,
+                    Role = UserRole.Viewer
                 };
 
                 var newUserProfile = new UserProfile
@@ -92,11 +99,6 @@ namespace Tornado.Application.UseCases
                 _logger.LogInformation("Performing transaction rollback...");
                 _unitOfWork.Rollback();
             }
-        }
-
-        private static string SimpleHash(string password)
-        {
-            return "hash" + password.ToUpper();
         }
     }
 }

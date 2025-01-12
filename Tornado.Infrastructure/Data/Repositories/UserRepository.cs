@@ -20,7 +20,7 @@ namespace Tornado.Infrastructure.Data.Repositories
             return Task.FromResult(_databaseContext.Users.Remove(entity));
         }
 
-        public Task<User?> FindByEmailAsync(string email)
+        public Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken)
         {
             return Task.FromResult(_databaseContext.Users.FirstOrDefault(user => user.Email == email));
         }

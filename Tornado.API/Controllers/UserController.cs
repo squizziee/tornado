@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Tornado.API.Attributes;
 using Tornado.Application.UseCases.Interfaces;
 using Tornado.Contracts.Requests;
+using Tornado.Contracts.Responses;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -11,40 +14,115 @@ namespace Tornado.API.Controllers
     public class UserController : ControllerBase
     {
         private IRegisterUserUseCase _registerUserUseCase;
-        public UserController(IRegisterUserUseCase registerUserUseCase) { 
+        private ILoginWithEmailAndPasswordUseCase _loginWithEmailAndPasswordUseCase;
+
+        private CookieOptions _accessTokenCookieOptions;
+        private CookieOptions _refreshTokenCookieOptions;
+
+        public UserController(
+            IRegisterUserUseCase registerUserUseCase,
+            ILoginWithEmailAndPasswordUseCase loginWithEmailAndPasswordUseCase,
+            IConfiguration configuration) { 
             _registerUserUseCase = registerUserUseCase;
-        }
-        // GET: api/<UserController>
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
+            _loginWithEmailAndPasswordUseCase = loginWithEmailAndPasswordUseCase;
+
+            _accessTokenCookieOptions = new()
+            {
+                Expires = DateTimeOffset.UtcNow.AddMinutes(double.Parse(configuration["Jwt:AccessToken:ExpirationTimeInMinutes"]!)),
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            };
+
+            _refreshTokenCookieOptions = new()
+            {
+                Expires = DateTimeOffset.UtcNow.AddMinutes(double.Parse(configuration["Jwt:RefreshToken:ExpirationTimeInDays"]!)),
+                HttpOnly = true,
+                IsEssential = true,
+                Secure = true,
+                SameSite = SameSiteMode.None
+            };
         }
 
-        // GET api/<UserController>/5
-        [HttpGet("{id}")]
-        public string Get(int id)
+        
+
+        // POST api/user/register
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromForm] RegisterUserRequest request, CancellationToken cancellationToken)
         {
-            return "value";
+            try
+            {
+                await _registerUserUseCase.ExecuteAsync(request, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+
+            return Ok();           
         }
 
-        // POST api/<UserController>
-        [HttpPost]
-        public async void Post([FromForm] RegisterUserRequest request, CancellationToken cancellationToken)
+        // POST api/user/login
+        [HttpPost("login")]
+        public async Task<IActionResult> LoginWithEmailAndPassword([FromForm] LoginWithEmailAndPasswordRequest request, CancellationToken cancellationToken)
         {
-            await _registerUserUseCase.ExecuteAsync(request, cancellationToken);
+            try
+            {
+                var tokens = await _loginWithEmailAndPasswordUseCase.ExecuteAsync(request, cancellationToken);
+
+                if (tokens.Item1 == "" && tokens.Item2 == "")
+                {
+                    return Unauthorized();
+                }
+
+                //var response = new SuccessfulLoginResponse
+                //{
+                //    AccessToken = tokens.Item1,
+                //    RefreshToken = tokens.Item2
+                //};
+
+                Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
+                Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            
         }
 
-        // PUT api/<UserController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPost("refresh")]
+        [AuthorizeWithRefreshToken]
+        public async Task<IActionResult> TryRefreshTokens([FromForm] CancellationToken cancellationToken)
         {
-        }
+            
+            //try
+            //{
+            //    var tokens = await _loginWithEmailAndPasswordUseCase.ExecuteAsync(request, cancellationToken);
 
-        // DELETE api/<UserController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
+            //    if (tokens.Item1 == "" && tokens.Item2 == "")
+            //    {
+            //        return Unauthorized();
+            //    }
+
+            //    var response = new SuccessfulLoginResponse
+            //    {
+            //        AccessToken = tokens.Item1,
+            //        RefreshToken = tokens.Item2
+            //    };
+
+            //    return Ok(response);
+            //}
+            //catch (Exception ex)
+            //{
+            //    return Unauthorized(ex.Message);
+            //}
+
+            return Ok();
+
         }
     }
 }

@@ -11,16 +11,31 @@ namespace Tornado.API.Extensions
 			services
 				.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 				.AddJwtBearer(
-					options => options.TokenValidationParameters = new TokenValidationParameters
+					options =>
 					{
-						ValidateIssuer = true,
-						ValidateAudience = true,
-						ValidateLifetime = true,
-						ValidateIssuerSigningKey = true,
-						ValidIssuer = configuration["JWT:issuer"],
-						ValidAudience = configuration["JWT:audience"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:key"]!))
-					}
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidateIssuerSigningKey = true,
+                            ValidIssuer = configuration["Jwt:AccessToken:Issuer"],
+                            ValidAudience = configuration["Jwt:AccessToken:Audience"],
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:AccessToken:Key"]!))
+                        };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = context =>
+                            {
+                                context.Request.Cookies.TryGetValue("accessToken", out var accessToken);
+                                if (!string.IsNullOrEmpty(accessToken))
+                                    context.Token = accessToken;
+                                return Task.CompletedTask;
+                            }
+                        };
+                    }
+					
 				);
 
 			services.AddAuthorizationBuilder()
