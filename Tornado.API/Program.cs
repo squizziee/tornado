@@ -42,6 +42,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUploadVideoUseCase, UploadVideoUseCase>();
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<ILoginWithEmailAndPasswordUseCase, LoginWithEmailAndPasswordUseCase>();
+builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
 
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<IJwtService, JwtService>();

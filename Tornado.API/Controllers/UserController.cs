@@ -13,22 +13,26 @@ namespace Tornado.API.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private IRegisterUserUseCase _registerUserUseCase;
-        private ILoginWithEmailAndPasswordUseCase _loginWithEmailAndPasswordUseCase;
+        private readonly IRegisterUserUseCase _registerUserUseCase;
+        private readonly ILoginWithEmailAndPasswordUseCase _loginWithEmailAndPasswordUseCase;
+        private readonly IRefreshTokensUseCase _refreshTokensUseCase;
 
-        private CookieOptions _accessTokenCookieOptions;
-        private CookieOptions _refreshTokenCookieOptions;
+        private readonly CookieOptions _accessTokenCookieOptions;
+        private readonly CookieOptions _refreshTokenCookieOptions;
 
         public UserController(
             IRegisterUserUseCase registerUserUseCase,
             ILoginWithEmailAndPasswordUseCase loginWithEmailAndPasswordUseCase,
+            IRefreshTokensUseCase refreshTokensUseCase,
             IConfiguration configuration) { 
             _registerUserUseCase = registerUserUseCase;
             _loginWithEmailAndPasswordUseCase = loginWithEmailAndPasswordUseCase;
+            _refreshTokensUseCase = refreshTokensUseCase;
 
             _accessTokenCookieOptions = new()
             {
-                Expires = DateTimeOffset.UtcNow.AddMinutes(double.Parse(configuration["Jwt:AccessToken:ExpirationTimeInMinutes"]!)),
+                Expires = DateTimeOffset.UtcNow.AddMinutes(
+                    double.Parse(configuration["Jwt:AccessToken:ExpirationTimeInMinutes"]!)),
                 HttpOnly = true,
                 IsEssential = true,
                 Secure = true,
@@ -37,7 +41,8 @@ namespace Tornado.API.Controllers
 
             _refreshTokenCookieOptions = new()
             {
-                Expires = DateTimeOffset.UtcNow.AddMinutes(double.Parse(configuration["Jwt:RefreshToken:ExpirationTimeInDays"]!)),
+                Expires = DateTimeOffset.UtcNow.AddDays(
+                    double.Parse(configuration["Jwt:RefreshToken:ExpirationTimeInDays"]!)),
                 HttpOnly = true,
                 IsEssential = true,
                 Secure = true,
@@ -76,12 +81,6 @@ namespace Tornado.API.Controllers
                     return Unauthorized();
                 }
 
-                //var response = new SuccessfulLoginResponse
-                //{
-                //    AccessToken = tokens.Item1,
-                //    RefreshToken = tokens.Item2
-                //};
-
                 Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
                 Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
 
@@ -98,31 +97,31 @@ namespace Tornado.API.Controllers
         [AuthorizeWithRefreshToken]
         public async Task<IActionResult> TryRefreshTokens([FromForm] CancellationToken cancellationToken)
         {
-            
-            //try
-            //{
-            //    var tokens = await _loginWithEmailAndPasswordUseCase.ExecuteAsync(request, cancellationToken);
+            try
+            {
+                var tokens = await _refreshTokensUseCase.ExecuteAsync(Request.Cookies["refreshToken"]!, cancellationToken);
 
-            //    if (tokens.Item1 == "" && tokens.Item2 == "")
-            //    {
-            //        return Unauthorized();
-            //    }
+                if (tokens.Item1 == "" && tokens.Item2 == "")
+                {
+                    return Unauthorized();
+                }
 
-            //    var response = new SuccessfulLoginResponse
-            //    {
-            //        AccessToken = tokens.Item1,
-            //        RefreshToken = tokens.Item2
-            //    };
+                Response.Cookies.Append("accessToken", tokens.Item1, _accessTokenCookieOptions);
+                Response.Cookies.Append("refreshToken", tokens.Item2, _refreshTokenCookieOptions);
 
-            //    return Ok(response);
-            //}
-            //catch (Exception ex)
-            //{
-            //    return Unauthorized(ex.Message);
-            //}
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+        }
 
+        [HttpGet("test")]
+        [Authorize(Roles = "Viewer")]
+        public async Task<IActionResult> Test()
+        {
             return Ok();
-
         }
     }
 }

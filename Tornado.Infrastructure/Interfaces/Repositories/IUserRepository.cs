@@ -10,5 +10,6 @@ namespace Tornado.Infrastructure.Interfaces.Repositories
     public interface IUserRepository : IRepository<User>
     {
         Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken);  
+        Task<User?> FindByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);  
     }
 }

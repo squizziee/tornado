@@ -25,6 +25,11 @@ namespace Tornado.Infrastructure.Data.Repositories
             return Task.FromResult(_databaseContext.Users.FirstOrDefault(user => user.Email == email));
         }
 
+        public Task<User?> FindByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(_databaseContext.Users.FirstOrDefault(user => user.RefreshToken == refreshToken));
+        }
+
         public Task<IEnumerable<User>> GetAllAsync(CancellationToken cancellationToken)
         {
             return Task.FromResult(_databaseContext.Users.AsEnumerable());
