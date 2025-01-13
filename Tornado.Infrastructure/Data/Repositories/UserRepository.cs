@@ -1,4 +1,5 @@
-﻿using Tornado.Domain.Models.Auth;
+﻿using Microsoft.EntityFrameworkCore;
+using Tornado.Domain.Models.Auth;
 using Tornado.Infrastructure.Interfaces.Repositories;
 
 namespace Tornado.Infrastructure.Data.Repositories
@@ -38,6 +39,15 @@ namespace Tornado.Infrastructure.Data.Repositories
         public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
             return Task.FromResult(_databaseContext.Users.FirstOrDefault(user => user.Id == id));
+        }
+
+        // includes profile with only primitive properties
+        public async Task<User?> GetWithProfileAsync(User user, CancellationToken cancellationToken)
+        {
+            return await _databaseContext.Users
+                .Where(u => u.Id == user.Id)
+                .Include(u => u.Profile)
+                .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         }
 
         public Task RemoveRangeAsync(IEnumerable<User> entities, CancellationToken cancellationToken)

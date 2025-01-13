@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Tornado.API.Attributes;
 using Tornado.Application.UseCases.Interfaces;
 using Tornado.Contracts.Requests;
-using Tornado.Contracts.Responses;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -16,6 +15,7 @@ namespace Tornado.API.Controllers
         private readonly IRegisterUserUseCase _registerUserUseCase;
         private readonly ILoginWithEmailAndPasswordUseCase _loginWithEmailAndPasswordUseCase;
         private readonly IRefreshTokensUseCase _refreshTokensUseCase;
+        private readonly IGetUserInfoUseCase _getUserInfoUseCase;
 
         private readonly CookieOptions _accessTokenCookieOptions;
         private readonly CookieOptions _refreshTokenCookieOptions;
@@ -24,10 +24,12 @@ namespace Tornado.API.Controllers
             IRegisterUserUseCase registerUserUseCase,
             ILoginWithEmailAndPasswordUseCase loginWithEmailAndPasswordUseCase,
             IRefreshTokensUseCase refreshTokensUseCase,
+            IGetUserInfoUseCase getUserInfoUseCase,
             IConfiguration configuration) { 
             _registerUserUseCase = registerUserUseCase;
             _loginWithEmailAndPasswordUseCase = loginWithEmailAndPasswordUseCase;
             _refreshTokensUseCase = refreshTokensUseCase;
+            _getUserInfoUseCase = getUserInfoUseCase;
 
             _accessTokenCookieOptions = new()
             {
@@ -95,7 +97,7 @@ namespace Tornado.API.Controllers
 
         [HttpPost("refresh")]
         [AuthorizeWithRefreshToken]
-        public async Task<IActionResult> TryRefreshTokens([FromForm] CancellationToken cancellationToken)
+        public async Task<IActionResult> RefreshTokens(CancellationToken cancellationToken)
         {
             try
             {
@@ -117,11 +119,20 @@ namespace Tornado.API.Controllers
             }
         }
 
-        [HttpGet("test")]
-        [Authorize(Roles = "Viewer")]
-        public async Task<IActionResult> Test()
+        [HttpGet]
+        [Authorize(Policy = "ViewerPolicy")]
+        public async Task<IActionResult> GetUserInfo([FromQuery] GetUserInfoRequest request, CancellationToken cancellationToken)
         {
-            return Ok();
+            try
+            {
+                var info = await _getUserInfoUseCase.ExecuteAsync(request, cancellationToken);
+
+                return Ok(info);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
     }
 }

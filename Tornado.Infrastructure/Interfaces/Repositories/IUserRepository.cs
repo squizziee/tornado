@@ -11,5 +11,6 @@ namespace Tornado.Infrastructure.Interfaces.Repositories
     {
         Task<User?> FindByEmailAsync(string email, CancellationToken cancellationToken);  
         Task<User?> FindByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken);  
+        Task<User?> GetWithProfileAsync(User user, CancellationToken cancellationToken);  
     }
 }

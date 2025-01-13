@@ -1,6 +1,8 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
 using Tornado.API.Extensions;
+using Tornado.Application.AutoMapperProfiles;
 using Tornado.Application.UseCases;
 using Tornado.Application.UseCases.Interfaces;
 using Tornado.Infrastructure.Data;
@@ -21,6 +23,11 @@ builder.Services.Configure<FormOptions>(options =>
 builder.Services.AddDbContext<ApplicationDatabaseContext>(options => 
     options.UseNpgsql(connectionString: builder.Configuration.GetConnectionString("DefaultDatabaseConnectionString"))
 );
+
+builder.Services.AddScoped<Mapper>();
+
+builder.Services.AddAutoMapper(typeof(UserMapperProfile));
+builder.Services.AddAutoMapper(typeof(UserProfileMapperProfile));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -43,6 +50,7 @@ builder.Services.AddScoped<IUploadVideoUseCase, UploadVideoUseCase>();
 builder.Services.AddScoped<IRegisterUserUseCase, RegisterUserUseCase>();
 builder.Services.AddScoped<ILoginWithEmailAndPasswordUseCase, LoginWithEmailAndPasswordUseCase>();
 builder.Services.AddScoped<IRefreshTokensUseCase, RefreshTokensUseCase>();
+builder.Services.AddScoped<IGetUserInfoUseCase, GetUserInfoUseCase>();
 
 builder.Services.AddScoped<IVideoUploadService, VideoUploadService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
