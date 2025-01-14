@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Tornado.Contracts.Requests;
+using Tornado.Contracts.Requests.Auth;
 
 namespace Tornado.API.Controllers
 {

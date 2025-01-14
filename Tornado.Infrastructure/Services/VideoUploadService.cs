@@ -5,6 +5,7 @@ using FFMpegCore;
 using Microsoft.Extensions.Configuration;
 using FFMpegCore.Enums;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Hosting;
 
 namespace Tornado.Infrastructure.Services
 {
@@ -12,7 +13,9 @@ namespace Tornado.Infrastructure.Services
 	{
 		private readonly ILogger<VideoUploadService> logger;
 		private readonly IConfiguration configuration;
-		private static readonly (int, int)[] dimensions = [
+        private readonly IWebHostEnvironment _environment;
+
+        private static readonly (int, int)[] dimensions = [
 			(256, 144),
 			(426, 240),
 			(480, 360),
@@ -25,14 +28,16 @@ namespace Tornado.Infrastructure.Services
 
 		public VideoUploadService(
 			ILogger<VideoUploadService> logger,
-			IConfiguration configuration)
+			IConfiguration configuration,
+            IWebHostEnvironment environment)
 		{
 			this.logger = logger;
 			this.configuration = configuration;
+			_environment = environment;
         }
 
 		public async Task<string> Upload(
-			IFormFile videoData,
+			MemoryStream videoData,
 			CancellationToken cancellationToken)
 		{
 
@@ -47,8 +52,8 @@ namespace Tornado.Infrastructure.Services
 				.ToString();
 
 			var uploadPath = Path.Combine(
-				Directory.GetCurrentDirectory(),
-				dirs!.Root,
+                _environment.WebRootPath,
+                dirs!.Root,
 				dirs!.Source,
 				fileName);
 
@@ -110,7 +115,7 @@ namespace Tornado.Infrastructure.Services
 
 				// path to upload for current dimension
                 var currentDimensionUploadPath = Path.Combine(
-					Directory.GetCurrentDirectory(),
+                    _environment.WebRootPath,
                     uploadDirectories.Root,
                     mappedDirs[i]!,
 					fileName + ".mov"
@@ -173,7 +178,7 @@ namespace Tornado.Infrastructure.Services
 
                 // path to upload for current dimension
                 var currentDimensionUploadPath = Path.Combine(
-                    Directory.GetCurrentDirectory(),
+                    _environment.WebRootPath,
                     uploadDirectories.Root,
                     mappedDirs[i]!,
                     fileName + ".mov"

@@ -23,12 +23,13 @@ namespace Tornado.Application.UseCases
             this.videoUploadService = videoUploadService;
         }
 
-        public async Task ExecuteAsync(UploadVideoRequest request, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(MemoryStream videoData, CancellationToken cancellationToken)
         {
             try
             {
-                var file = request.VideoData;
-                //Task.Run(() => videoUploadService.Upload(file, cancellationToken));
+                //var file = request.VideoData;
+
+                await videoUploadService.Upload(videoData, cancellationToken);
             }
             catch (Exception ex)
             {

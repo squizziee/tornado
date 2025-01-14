@@ -1,9 +1,9 @@
-﻿using Tornado.Application.UseCases.Interfaces;
-using Tornado.Contracts.Requests;
+﻿using Tornado.Application.UseCases.Interfaces.Auth;
+using Tornado.Contracts.Requests.Auth;
 using Tornado.Infrastructure.Interfaces;
 using Tornado.Infrastructure.Services.Interfaces;
 
-namespace Tornado.Application.UseCases
+namespace Tornado.Application.UseCases.Auth
 {
     public class LoginWithEmailAndPasswordUseCase : ILoginWithEmailAndPasswordUseCase
     {
@@ -12,8 +12,8 @@ namespace Tornado.Application.UseCases
         private readonly IPasswordHashingService _passwordHashingService;
 
         public LoginWithEmailAndPasswordUseCase(
-            IUnitOfWork unitOfWork, 
-            IJwtService jwtService, 
+            IUnitOfWork unitOfWork,
+            IJwtService jwtService,
             IPasswordHashingService passwordHashingService)
         {
             _jwtService = jwtService;
@@ -48,7 +48,7 @@ namespace Tornado.Application.UseCases
             {
                 return ("", "");
             }
-            
+
             return (newAccessToken, newRefreshToken);
         }
     }

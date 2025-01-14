@@ -1,13 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tornado.Application.UseCases.Interfaces;
-using Tornado.Contracts.Requests;
+using Tornado.Application.UseCases.Interfaces.Auth;
+using Tornado.Contracts.Requests.Auth;
 using Tornado.Domain.Enums;
 using Tornado.Domain.Models.Auth;
 using Tornado.Domain.Models.ProfileModels;
 using Tornado.Infrastructure.Interfaces;
 using Tornado.Infrastructure.Services.Interfaces;
 
-namespace Tornado.Application.UseCases
+namespace Tornado.Application.UseCases.Auth
 {
     public class RegisterUserUseCase : IRegisterUserUseCase
     {
@@ -94,7 +94,9 @@ namespace Tornado.Application.UseCases
 
                 _logger.LogInformation($"New user fully registered");
 
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 _logger.LogError("Exception occured while trying to register new user: " + ex.Message);
                 _logger.LogInformation("Performing transaction rollback...");
                 _unitOfWork.Rollback();

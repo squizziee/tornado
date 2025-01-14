@@ -47,18 +47,18 @@ namespace Tornado.Infrastructure.Data.Repositories
                 throw new Exception($"No profile entity with id of {entity.Id} was found");
             }
 
-            // only these five should be able to change
+            // only these four should be able to change
             itemFound.Nickname = entity.Nickname;
             itemFound.FirstName = entity.FirstName;
             itemFound.LastName = entity.LastName;
             itemFound.AvatarUrl = entity.AvatarUrl;
 
-            if (itemFound.ChannelId != null && itemFound.Channel != null)
-            {
-                throw new Exception($"Can not update channel id that was already set. Profile id - {itemFound.Id}");
-            }
+            //if (itemFound.ChannelId != null && entity.ChannelId != null)
+            //{
+            //    throw new Exception($"Can not update channel id that was already set. Profile id - {itemFound.Id}");
+            //}
 
-            itemFound.ChannelId = entity.ChannelId;
+            //itemFound.ChannelId = entity.ChannelId;
 
             await _databaseContext.SaveChangesAsync(cancellationToken);
         }

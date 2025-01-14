@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using Tornado.Application.UseCases.Interfaces;
+using Tornado.Application.UseCases.Interfaces.Auth;
 using Tornado.Contracts.Requests;
 using Tornado.Infrastructure.Interfaces;
 using Tornado.Infrastructure.Services.Interfaces;
 
-namespace Tornado.Application.UseCases
+namespace Tornado.Application.UseCases.Auth
 {
     public class RefreshTokensUseCase : IRefreshTokensUseCase
     {

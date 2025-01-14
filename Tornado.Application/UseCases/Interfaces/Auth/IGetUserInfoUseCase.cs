@@ -1,7 +1,7 @@
 ﻿using Tornado.Contracts.DTO;
-using Tornado.Contracts.Requests;
+using Tornado.Contracts.Requests.Auth;
 
-namespace Tornado.Application.UseCases.Interfaces
+namespace Tornado.Application.UseCases.Interfaces.Auth
 {
     public interface IGetUserInfoUseCase
     {

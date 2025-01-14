@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Tornado.API.Attributes;
-using Tornado.Application.UseCases.Interfaces;
-using Tornado.Contracts.Requests;
+using Tornado.Application.UseCases.Interfaces.Auth;
+using Tornado.Contracts.Requests.Auth;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 

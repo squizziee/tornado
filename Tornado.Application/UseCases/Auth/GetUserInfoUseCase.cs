@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
-using Tornado.Application.UseCases.Interfaces;
+using Tornado.Application.UseCases.Interfaces.Auth;
 using Tornado.Contracts.DTO;
-using Tornado.Contracts.Requests;
+using Tornado.Contracts.Requests.Auth;
 using Tornado.Domain.Models.Auth;
 using Tornado.Infrastructure.Interfaces;
 using Tornado.Infrastructure.Services.Interfaces;
 
-namespace Tornado.Application.UseCases
+namespace Tornado.Application.UseCases.Auth
 {
     public class GetUserInfoUseCase : IGetUserInfoUseCase
     {

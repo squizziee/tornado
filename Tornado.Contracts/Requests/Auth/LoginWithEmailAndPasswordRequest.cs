@@ -1,4 +1,4 @@
-﻿namespace Tornado.Contracts.Requests
+﻿namespace Tornado.Contracts.Requests.Auth
 {
     public record LoginWithEmailAndPasswordRequest
     {

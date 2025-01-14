@@ -9,6 +9,6 @@ namespace Tornado.Infrastructure.Services.Interfaces
 {
     public interface IVideoUploadService
     {
-        Task<string> Upload(IFormFile videoData, CancellationToken cancellationToken);
+        Task<string> Upload(MemoryStream videoData, CancellationToken cancellationToken);
     }
 }

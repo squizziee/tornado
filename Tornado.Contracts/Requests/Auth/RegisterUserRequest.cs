@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 
-namespace Tornado.Contracts.Requests
+namespace Tornado.Contracts.Requests.Auth
 {
     public record RegisterUserRequest
     {

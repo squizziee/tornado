@@ -1,6 +1,6 @@
 ﻿using Tornado.Contracts.Requests;
 
-namespace Tornado.Application.UseCases.Interfaces
+namespace Tornado.Application.UseCases.Interfaces.Auth
 {
     public interface IRefreshTokensUseCase
     {

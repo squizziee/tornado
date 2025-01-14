@@ -4,6 +4,6 @@ namespace Tornado.Application.UseCases.Interfaces
 {
     public interface IUploadVideoUseCase
     {
-        Task ExecuteAsync(UploadVideoRequest request, CancellationToken cancellationToken);
+        Task ExecuteAsync(MemoryStream videoData, CancellationToken cancellationToken);
     }
 }
