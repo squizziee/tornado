@@ -17,6 +17,6 @@ namespace Tornado.Domain.Models.VideoModels
         public string SourceFileName { get; set; } = string.Empty;
         public string PreviewSourceUrl { get; set; } = string.Empty;
         public TimeSpan Duration { get; set; }
-        public VideoMetrics Metrics { get; set; }
+        //public VideoMetrics Metrics { get; set; }
     }
 }

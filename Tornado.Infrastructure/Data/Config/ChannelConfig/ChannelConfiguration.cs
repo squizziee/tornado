@@ -42,11 +42,11 @@ namespace Tornado.Infrastructure.Data.Config.ChannelConfig
                 .WithOne(video => video.Channel)
                 .HasForeignKey(video => video.ChannelId);
 
-            builder
-               .HasOne(channel => channel.Metrics)
-               .WithOne(metrics => metrics.Channel)
-               .HasForeignKey<ChannelMetrics>(metrics => metrics.ChannelId)
-               .IsRequired();
+            //builder
+            //   .HasOne(channel => channel.Metrics)
+            //   .WithOne(metrics => metrics.Channel)
+            //   .HasForeignKey<ChannelMetrics>(metrics => metrics.ChannelId)
+            //   .IsRequired();
         }
     }
 }

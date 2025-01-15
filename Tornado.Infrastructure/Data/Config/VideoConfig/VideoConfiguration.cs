@@ -36,10 +36,10 @@ namespace Tornado.Infrastructure.Data.Config.VideoConfig
                 .Property(video => video.Duration)
                 .IsRequired();
 
-            builder
-                .HasOne(video => video.Metrics)
-                .WithOne(metrics => metrics.Video)
-                .HasForeignKey<VideoMetrics>(metrics => metrics.VideoId);
+            //builder
+            //    .HasOne(video => video.Metrics)
+            //    .WithOne(metrics => metrics.Video)
+            //    .HasForeignKey<VideoMetrics>(metrics => metrics.VideoId);
 
             builder
                 .HasMany(video => video.VideoCommentChains)

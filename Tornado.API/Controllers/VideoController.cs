@@ -43,7 +43,7 @@ namespace Tornado.API.Controllers
 			uploadVideoUseCase.ExecuteAsync(memoryStream, cancellationToken);
 			#pragma warning restore CS4014
 
-			return Ok("File uploaded");
+			return Ok("Video uploading started");
 		}
 
 

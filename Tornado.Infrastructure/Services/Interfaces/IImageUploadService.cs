@@ -12,5 +12,7 @@ namespace Tornado.Infrastructure.Services.Interfaces
     {
         Avatar,
         VideoPreview,
+        ChannelHeader,
+        ChannelAvatar,
     }
 }

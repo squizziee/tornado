@@ -3,7 +3,6 @@ using Tornado.Application.UseCases.Interfaces.Profile;
 using Tornado.Contracts.DTO;
 using Tornado.Contracts.Requests.Profile;
 using Tornado.Domain.Models.ProfileModels;
-using Tornado.Infrastructure.Data;
 using Tornado.Infrastructure.Interfaces;
 
 namespace Tornado.Application.UseCases.Profile

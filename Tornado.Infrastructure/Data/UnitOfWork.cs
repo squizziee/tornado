@@ -25,8 +25,8 @@ namespace Tornado.Infrastructure.Data
 			IUserRepository userRepository,
 			IUserProfileRepository userProfileRepository,
 			IUserRatingsRepository userRatingsRepository,
-			IUserCommentRepository userCommentRepository//,
-			//IChannelRepository channelRepository,
+			IUserCommentRepository userCommentRepository,
+			IChannelRepository channelRepository//,
 			//IChannelMetricsRepository channelMetricsRepository,
 			//IVideoRepository videoRepository,
 			//IVideoRatingRepository videoRatingRepository,
@@ -40,7 +40,7 @@ namespace Tornado.Infrastructure.Data
 			this.UserProfileRepository = userProfileRepository;
 			this.UserRatingsRepository = userRatingsRepository;
 			this.UserCommentRepository = userCommentRepository;
-			//this.ChannelRepository = channelRepository;
+			this.ChannelRepository = channelRepository;
 			//this.ChannelMetricsRepository = channelMetricsRepository;
 			//this.VideoRepository = videoRepository;
 			//this.VideoRatingRepository = videoRatingRepository;

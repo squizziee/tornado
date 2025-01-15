@@ -5,8 +5,10 @@ using Tornado.API.Extensions;
 using Tornado.Application.AutoMapperProfiles;
 using Tornado.Application.UseCases;
 using Tornado.Application.UseCases.Auth;
+using Tornado.Application.UseCases.Channel;
 using Tornado.Application.UseCases.Interfaces;
 using Tornado.Application.UseCases.Interfaces.Auth;
+using Tornado.Application.UseCases.Interfaces.Channel;
 using Tornado.Application.UseCases.Interfaces.Profile;
 using Tornado.Application.UseCases.Profile;
 using Tornado.Infrastructure.Data;
@@ -32,6 +34,8 @@ builder.Services.AddScoped<Mapper>();
 
 builder.Services.AddAutoMapper(typeof(UserMapperProfile));
 builder.Services.AddAutoMapper(typeof(UserProfileMapperProfile));
+builder.Services.AddAutoMapper(typeof(ChannelMapperProfile));
+builder.Services.AddAutoMapper(typeof(VideoMapperProfile));
 
 // binding appsettings.json sections
 builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUpload"));
@@ -44,6 +48,7 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserProfileRepository, UserProfileRepository>();
 builder.Services.AddScoped<IUserCommentRepository, UserCommentsRepository>();
 builder.Services.AddScoped<IUserRatingsRepository, UserRatingsRepository>();
+builder.Services.AddScoped<IChannelRepository, ChannelRepository>();
 
 // auth and policies
 builder.Services.AddJwtAuthentication(builder.Configuration);
@@ -62,6 +67,11 @@ builder.Services.AddScoped<IGetUserInfoUseCase, GetUserInfoUseCase>();
 
 builder.Services.AddScoped<IGetUserProfileUseCase, GetUserProfileUseCase>();
 builder.Services.AddScoped<IUpdateUserProfileUseCase, UpdateUserProfileUseCase>();
+
+builder.Services.AddScoped<ICreateChannelUseCase, CreateChannelUseCase>();
+builder.Services.AddScoped<IUpdateChannelUseCase, UpdateChannelUseCase>();
+builder.Services.AddScoped<IDeleteChannelUseCase, DeleteChannelUseCase>();
+builder.Services.AddScoped<IGetChannelUseCase, GetChannelUseCase>();
 
 builder.Services.AddSingleton<IVideoUploadService, VideoUploadService>();
 builder.Services.AddSingleton<IImageUploadService, ImageUploadService>();

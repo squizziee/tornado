@@ -38,6 +38,7 @@ namespace Tornado.API.Controllers
 
         // PUT api/profile?id=...
         [HttpPut]
+        [Authorize]
         public async Task<IActionResult> Put([FromForm] UpdateUserProfileRequest request, CancellationToken cancellationToken)
         {
             try

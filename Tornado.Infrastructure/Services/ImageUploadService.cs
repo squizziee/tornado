@@ -40,8 +40,10 @@ namespace Tornado.Infrastructure.Services
 		{
 			var exactDir = imageType switch
 			{
-				ImageType.Avatar => _configuration["ImageUpload:Avatars"]!,
-				ImageType.VideoPreview => _configuration["ImageUpload:VideoPreviews"]!,
+				ImageType.Avatar => _settings.Avatars,
+				ImageType.VideoPreview => _settings.VideoPreviews,
+				ImageType.ChannelHeader => _settings.ChannelHeaders,
+				ImageType.ChannelAvatar => _settings.ChannelAvatars,
 				_ => throw new Exception($"Unkwnown image type: {imageType}")
             };
 
@@ -79,6 +81,8 @@ namespace Tornado.Infrastructure.Services
 		public required string Root { get; set; }
 		public required string Avatars { get; set; }
 		public required string VideoPreviews { get; set; }
+		public required string ChannelHeaders { get; set; }
+		public required string ChannelAvatars { get; set; }
 		public required string[] SupportedExtensions { get; set; }
 	}
 }
