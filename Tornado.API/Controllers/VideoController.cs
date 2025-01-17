@@ -35,15 +35,22 @@ namespace Tornado.API.Controllers
 		public async Task<IActionResult> UploadVideo([FromForm] UploadVideoRequest request, CancellationToken cancellationToken)
 		{
 
-			#pragma warning disable CS4014
-			var memoryStream = new MemoryStream();
-			request.VideoData.CopyTo(memoryStream);
-			memoryStream.Position = 0;
+			try
+			{
+				var memoryStream = new MemoryStream();
+				request.VideoData.CopyTo(memoryStream);
+				memoryStream.Position = 0;
 
-			uploadVideoUseCase.ExecuteAsync(memoryStream, cancellationToken);
-			#pragma warning restore CS4014
+#pragma warning disable CS4014
+				uploadVideoUseCase.ExecuteAsync(request, memoryStream, cancellationToken);
+#pragma warning restore CS4014
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
 
-			return Ok("Video uploading started");
+            return Ok("Video uploading started");
 		}
 
 

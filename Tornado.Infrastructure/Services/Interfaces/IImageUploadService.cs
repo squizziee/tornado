@@ -5,6 +5,7 @@ namespace Tornado.Infrastructure.Services.Interfaces
     public interface IImageUploadService
     {
         Task<string> UploadImage(IFormFile image, ImageType imageType);
+        Task<string> UploadEmptyImage(ImageType imageType);
         Task DeleteUploadedImage(string imageUrl);
     }
 

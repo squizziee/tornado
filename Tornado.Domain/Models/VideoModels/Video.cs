@@ -1,6 +1,4 @@
-﻿using Tornado.Domain.Models.VideoModels;
-using Tornado.Domain.Models.ProfileModels;
-using Tornado.Domain.Models.ChannelModels;
+﻿using Tornado.Domain.Models.ChannelModels;
 
 namespace Tornado.Domain.Models.VideoModels
 {
@@ -18,5 +16,6 @@ namespace Tornado.Domain.Models.VideoModels
         public string PreviewSourceUrl { get; set; } = string.Empty;
         public TimeSpan Duration { get; set; }
         //public VideoMetrics Metrics { get; set; }
+        public DateOnly CreatedAt { get; set; }
     }
 }

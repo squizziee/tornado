@@ -13,5 +13,6 @@ namespace Tornado.Domain.Models.VideoModels
         public IEnumerable<CommentRating> CommentRatings { get; set; } = [];
         public bool IsReply { get; set; }
         public Guid? RepliesTo { get; set; }
+        public DateOnly CreatedAt { get; set; }
     }
 }

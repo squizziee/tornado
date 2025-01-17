@@ -6,5 +6,6 @@
         public Guid VideoId { get; set; }
         public Video Video { get; set; }
         public IEnumerable<VideoComment> VideoComments { get; set; } = [];
+        public DateOnly CreatedAt { get; set; }
     }
 }

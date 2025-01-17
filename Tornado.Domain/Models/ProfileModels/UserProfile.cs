@@ -17,5 +17,6 @@ namespace Tornado.Domain.Models.ProfileModels
         public string? AvatarUrl { get; set; }
         public Guid? ChannelId { get; set; }
         public Channel? Channel { get; set; }
+        public DateOnly CreatedAt { get; set; }
     }
 }

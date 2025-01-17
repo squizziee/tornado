@@ -4,6 +4,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tornado.Infrastructure.Services.Interfaces;
+using Tornado.Infrastructure.Services.Settings;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tornado.Infrastructure.Services
 {
@@ -36,7 +38,34 @@ namespace Tornado.Infrastructure.Services
 			return Task.CompletedTask;
 		}
 
-		public async Task<string> UploadImage(IFormFile image, ImageType imageType)
+        public Task<string> UploadEmptyImage(ImageType imageType)
+        {
+            var exactDir = imageType switch
+            {
+                ImageType.Avatar => _settings.Avatars,
+                ImageType.VideoPreview => _settings.VideoPreviews,
+                ImageType.ChannelHeader => _settings.ChannelHeaders,
+                ImageType.ChannelAvatar => _settings.ChannelAvatars,
+                _ => throw new Exception($"Unkwnown image type: {imageType}")
+            };
+
+            var uploadfFilename = Guid.NewGuid().ToString();
+
+            var uploadPath = Path.Combine(
+                _environment.WebRootPath,
+                _settings.Root,
+                exactDir,
+                uploadfFilename + ".png"
+            );
+
+            _logger.LogInformation($"Starting image upload {uploadPath} of type {imageType}");
+
+            using var stream = File.Create(uploadPath);
+
+            return Task.FromResult(uploadPath);
+        }
+
+        public async Task<string> UploadImage(IFormFile image, ImageType imageType)
 		{
 			var exactDir = imageType switch
 			{
@@ -74,15 +103,5 @@ namespace Tornado.Infrastructure.Services
 
 			return uploadPath;
 		}
-	}
-
-	public record ImageUploadSettings
-	{
-		public required string Root { get; set; }
-		public required string Avatars { get; set; }
-		public required string VideoPreviews { get; set; }
-		public required string ChannelHeaders { get; set; }
-		public required string ChannelAvatars { get; set; }
-		public required string[] SupportedExtensions { get; set; }
 	}
 }
