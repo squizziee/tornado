@@ -5,27 +5,30 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Tornado.Infrastructure.Services.Interfaces;
 using Tornado.Infrastructure.Services.Settings;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Tornado.Infrastructure.Services
 {
 	public class ImageUploadService : IImageUploadService
 	{
 		private readonly IConfiguration _configuration;
-		private readonly ImageUploadSettings _settings;
+		private readonly ImageUploadSettings _uploadSettings;
 		private readonly ILogger<ImageUploadService> _logger;
 		private readonly IWebHostEnvironment _environment;
-		public ImageUploadService(
+        private readonly HostSettings _hostSettings;
+
+        public ImageUploadService(
 			IConfiguration configuration, 
 			IOptions<ImageUploadSettings> options,
 			ILogger<ImageUploadService> logger,
+            IOptions<HostSettings> hOptions,
             IWebHostEnvironment environment) 
 		{ 
 			_configuration = configuration;
-			_settings = options.Value;
+			_uploadSettings = options.Value;
 			_logger = logger;
 			_environment = environment;
-		}
+            _hostSettings = hOptions.Value;
+        }
 
 
 		public Task DeleteUploadedImage(string imageUrl)
@@ -38,14 +41,14 @@ namespace Tornado.Infrastructure.Services
 			return Task.CompletedTask;
 		}
 
-        public Task<string> UploadEmptyImage(ImageType imageType)
+        public Task<(string, string)> UploadEmptyImage(ImageType imageType)
         {
             var exactDir = imageType switch
             {
-                ImageType.Avatar => _settings.Avatars,
-                ImageType.VideoPreview => _settings.VideoPreviews,
-                ImageType.ChannelHeader => _settings.ChannelHeaders,
-                ImageType.ChannelAvatar => _settings.ChannelAvatars,
+                ImageType.Avatar => _uploadSettings.Avatars,
+                ImageType.VideoPreview => _uploadSettings.VideoPreviews,
+                ImageType.ChannelHeader => _uploadSettings.ChannelHeaders,
+                ImageType.ChannelAvatar => _uploadSettings.ChannelAvatars,
                 _ => throw new Exception($"Unkwnown image type: {imageType}")
             };
 
@@ -53,7 +56,7 @@ namespace Tornado.Infrastructure.Services
 
             var uploadPath = Path.Combine(
                 _environment.WebRootPath,
-                _settings.Root,
+                _uploadSettings.Root,
                 exactDir,
                 uploadfFilename + ".png"
             );
@@ -62,23 +65,37 @@ namespace Tornado.Infrastructure.Services
 
             using var stream = File.Create(uploadPath);
 
-            return Task.FromResult(uploadPath);
+			//         var accessiblePath = Path.Combine(
+			//            _hostSettings.BaseUrl,
+			//            _uploadSettings.Root,
+			//            exactDir,
+			//            uploadfFilename + ".png"
+			//);
+
+			// kind of crappy but whatever
+			var accessiblePath =
+			   _hostSettings.BaseUrl + "/" +
+			   _uploadSettings.Root.Replace("\\", "/") + "/" +
+			   exactDir + "/" +
+			   uploadfFilename + ".png";
+
+            return Task.FromResult((uploadPath, accessiblePath));
         }
 
         public async Task<string> UploadImage(IFormFile image, ImageType imageType)
 		{
 			var exactDir = imageType switch
 			{
-				ImageType.Avatar => _settings.Avatars,
-				ImageType.VideoPreview => _settings.VideoPreviews,
-				ImageType.ChannelHeader => _settings.ChannelHeaders,
-				ImageType.ChannelAvatar => _settings.ChannelAvatars,
+				ImageType.Avatar => _uploadSettings.Avatars,
+				ImageType.VideoPreview => _uploadSettings.VideoPreviews,
+				ImageType.ChannelHeader => _uploadSettings.ChannelHeaders,
+				ImageType.ChannelAvatar => _uploadSettings.ChannelAvatars,
 				_ => throw new Exception($"Unkwnown image type: {imageType}")
             };
 
 			var providedImageExtension = image.FileName.Split('.').Last();
 
-			if (_settings.SupportedExtensions
+			if (_uploadSettings.SupportedExtensions
 					.Where(ext => ext == providedImageExtension)
 					.FirstOrDefault() == null)
 			{
@@ -89,7 +106,7 @@ namespace Tornado.Infrastructure.Services
 
             var uploadPath = Path.Combine(
 				_environment.WebRootPath,
-				_configuration["ImageUpload:Root"]!,
+				_uploadSettings.Root,
                 exactDir,
 				uploadfFilename + "." + providedImageExtension
 			);
@@ -101,7 +118,13 @@ namespace Tornado.Infrastructure.Services
 				await image.CopyToAsync(stream);
 			}
 
-			return uploadPath;
+            var accessiblePath =
+               _hostSettings.BaseUrl + "/" +
+               _uploadSettings.Root.Replace("\\", "/") + "/" +
+               exactDir + "/" +
+               uploadfFilename + providedImageExtension;
+
+            return uploadPath;
 		}
 	}
 }

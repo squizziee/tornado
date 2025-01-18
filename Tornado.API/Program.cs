@@ -45,6 +45,7 @@ builder.Services.AddAutoMapper(typeof(VideoMapperProfile));
 builder.Services.Configure<ImageUploadSettings>(builder.Configuration.GetSection("ImageUpload"));
 builder.Services.Configure<FFmpegSettings>(builder.Configuration.GetSection("FFmpeg"));
 builder.Services.Configure<VideoUploadDirectorySettings>(builder.Configuration.GetSection("VideoUpload"));
+builder.Services.Configure<HostSettings>(builder.Configuration.GetSection("HostInfo"));
 
 // unit of work
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -97,6 +98,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles();
 
 app.UseAuthorization();
 

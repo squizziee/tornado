@@ -5,7 +5,8 @@ namespace Tornado.Infrastructure.Services.Interfaces
     public interface IImageUploadService
     {
         Task<string> UploadImage(IFormFile image, ImageType imageType);
-        Task<string> UploadEmptyImage(ImageType imageType);
+        // (real absolute path, relative to host path) e.g. (C:\..., https://localhost:1234/)
+        Task<(string, string)> UploadEmptyImage(ImageType imageType);
         Task DeleteUploadedImage(string imageUrl);
     }
 
